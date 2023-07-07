@@ -16,3 +16,7 @@ class Ball:
         
 		if y_bounce:
 			self.velocity_x *= -1
+
+	def bounce_from_paddle(self, velocity_x):
+		self.velocity_y *= -1
+		self.velocity_x = velocity_x
