@@ -20,3 +20,9 @@ class Ball:
     def bounce_from_paddle(self, velocity_x):
         self.velocity_y *= -1
         self.velocity_x = velocity_x
+
+    def ball_location(self):
+        return self.pos_x, self.pos_y
+
+    def ball_velocity(self):
+        return self.velocity_x, self.velocity_y

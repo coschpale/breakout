@@ -12,14 +12,25 @@ class Paddle:
         if self.pos_x + DISTANCE + self.paddle_width <= self.max_width:
             self.pos_x += DISTANCE
 
+        return self.pos_x
+
     def moveLeft(self):
         if self.pos_x - DISTANCE >= 0:
             self.pos_x -= DISTANCE
+
+        return self.pos_x
 
     def moveRightFast(self):
         if self.pos_x + DISTANCE*2 + self.paddle_width <= self.max_width:
             self.pos_x += DISTANCE*2
 
+        return self.pos_x
+
     def moveLeftFast(self):
         if self.pos_x - DISTANCE*2 >= 0:
             self.pos_x -= DISTANCE*2
+
+        return self.pos_x
+
+    def paddle_location(self):
+        return self.pos_x

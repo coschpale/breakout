@@ -8,4 +8,8 @@ class Brick:
 
 	def kill(self):
 		self.alive = False
+		return self.pos_x, self.pos_y, self.alive
+
+	def brick_location_alive(self):
+		return self.pos_x, self.pos_y, self.alive
 
