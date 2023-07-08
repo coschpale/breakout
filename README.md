@@ -10,6 +10,3 @@
 ## Important
 
 Inside the method `printStats` are all the important informations for our Monte Carlo approach (time and score)
-
-## Needed libraries to run
-`pip install pyautogui`

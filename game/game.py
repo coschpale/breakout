@@ -4,7 +4,6 @@ from ball import Ball
 from paddle import Paddle
 from brick import Brick
 import numpy as np
-import pyautogui
 import argparse
 
 # parse if we want to use the agent or play by our own
@@ -36,24 +35,23 @@ pygame.display.set_caption("Game Board")
 
 def adapter():
     # Here we should let the agent choose the action to take
-    action_choice = np.random.choice([0, 1, 2, 3, 4])
-    action_string = "stay"
+    adapter_choice = np.random.choice([0, 1, 2, 3, 4])
+    choice_string = "stay"
 
     # Map the action to arrow key presses
-    if action_choice == 0:
+    if adapter_choice == 0:
         # Do nothing
-        return action_string
-    elif action_choice == 1:
-        action_string = "left"
-    elif action_choice == 2:
-        action_string = "right"
-    elif action_choice == 3:
-        action_string = "up"
-    elif action_choice == 4:
-        action_string = "down"
+        return choice_string, adapter_choice
+    elif adapter_choice == 1:
+        choice_string = "left"
+    elif adapter_choice == 2:
+        choice_string = "right"
+    elif adapter_choice == 3:
+        choice_string = "up"
+    elif adapter_choice == 4:
+        choice_string = "down"
 
-    pyautogui.press(action_string)
-    return action_string
+    return choice_string, adapter_choice
 
 
 def checkGameOver(ball):
@@ -151,20 +149,44 @@ for row in range(brick_rows):
 running = True
 start_time = time.time()
 last_agent_call = time.time()
+action_choice = 0
 while running:
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_LEFT:
+    # call the agent if passed as command line argument but only every second and not permanently for smooth gameplay
+    if args.agent:
+        if time.time() - last_agent_call >= 1:
+            action_string, action_choice = adapter()
+            print("action chosen by agent: " + str(action_string))
+            last_agent_call = time.time()
+
+            if action_choice == 0:
+                pass
+            elif action_choice == 1:
                 paddle.moveLeft()
-            elif event.key == pygame.K_RIGHT:
+            elif action_choice == 2:
                 paddle.moveRight()
-            elif event.key == pygame.K_UP:
+            elif action_choice == 3:
                 paddle.moveRightFast()
-            elif event.key == pygame.K_DOWN:
+            elif action_choice == 4:
                 paddle.moveLeftFast()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+    if not args.agent:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN and not args.agent:
+                if event.key == pygame.K_LEFT:
+                    paddle.moveLeft()
+                elif event.key == pygame.K_RIGHT:
+                    paddle.moveRight()
+                elif event.key == pygame.K_UP:
+                    paddle.moveRightFast()
+                elif event.key == pygame.K_DOWN:
+                    paddle.moveLeftFast()
 
     # Fill the background
     screen.fill(BLACK)
@@ -175,12 +197,6 @@ while running:
             x = col * cell_size
             y = row * cell_size
             pygame.draw.rect(screen, WHITE, (x, y, cell_size - 1, cell_size - 1))
-
-    # call the agent if passed as command line argument but only every second and not permanently for smooth gameplay
-    if args.agent and time.time() - last_agent_call >= 1:
-        action = adapter()
-        print("action chosen by agent: " + str(action))
-        last_agent_call = time.time()
 
     # Draw additional elements (e.g., game pieces)
     ball.move()
