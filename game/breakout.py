@@ -29,7 +29,7 @@ class BreakoutEnv(gym.Env):
 
         self.brick_rows = 3
         self.brick_cols = 5
-        self.terminal_reward = -(self.brick_rows * self.brick_cols)
+        self.terminal_reward = (self.brick_rows * self.brick_cols)
 
         self.score = 0
         self.time = 0
@@ -43,11 +43,11 @@ class BreakoutEnv(gym.Env):
         self.action_space = spaces.Discrete(5)
 
         self._action_to_key = {
-            0: "stay",
-            1: "left",
-            2: "right",
-            3: "up",
-            4: "down"
+            "stay": 0,
+            "left": 1,
+            "right": 2,
+            "up": 3,
+            "down": 4
         }
 
         self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
@@ -114,8 +114,11 @@ class BreakoutEnv(gym.Env):
         reward = 0
         if self._check_collision_bricks():
             reward = 1
+            self.reward -= reward
         elif self._check_game_over():
-            reward = -1000
+            # not sure if we really need this bc we only have 1 live, but if the reward overall is taken into account
+            reward = 1000
+            self.reward += reward
 
         self._render_frame()
 
