@@ -3,9 +3,13 @@
 `cd game`
 `python3 game.py`
 
-## How to train
+## How to let the computer play
 `cd game`
 `python3 game.py -a`
+
+## How to train
+`cd game`
+`python3 train.py`
 
 ## Important
 

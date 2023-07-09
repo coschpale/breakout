@@ -1,4 +1,3 @@
-import gym
 from gym import spaces
 import pygame
 import numpy as np
@@ -14,7 +13,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 
 
-class BreakoutEnv(gym.Env):
+class BreakoutEnv:
     metadata = {'render_modes': ['human']}
 
     def __init__(self):
@@ -36,11 +35,12 @@ class BreakoutEnv(gym.Env):
         self.reward = 0
 
         # observation space - 15x10x3
-        self.observation_space = spaces.Box(low=0, high=255, shape=(self.size_height, self.size_width, 3),
-                                            dtype=np.uint8)
+        # self.observation_space = spaces.Box(low=0, high=255, shape=(self.size_height, self.size_width, 3), dtype=np.uint8)
+        self.observation_space = 15 * 10 * 3
 
         # 5 actions - move left, move right, move left fast, move right fast, do nothing
-        self.action_space = spaces.Discrete(5)
+        # self.action_space = spaces.Discrete(5)
+        self.action_space = 5
 
         self._action_to_key = {
             "stay": 0,
@@ -70,10 +70,9 @@ class BreakoutEnv(gym.Env):
         return np.array(pygame.surfarray.array3d(pygame.display.get_surface()))
 
     def _get_info(self):
-        return {"score": self.score, "time": self.time}
+        return {"reward": self.reward, "time": self.time}
 
-    def reset(self, seed=None, options=None):
-        super().reset(seed=seed)
+    def reset(self):
         self.score = 0
         self.time = 0
         self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
