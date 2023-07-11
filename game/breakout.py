@@ -36,11 +36,12 @@ class BreakoutEnv:
 
         # observation space - 15x10x3
         # self.observation_space = spaces.Box(low=0, high=255, shape=(self.size_height, self.size_width, 3), dtype=np.uint8)
-        self.observation_space = 15 * 10 * 3
+        #self.observation_space = 15 * 10 * 3
+        self.observation_space = spaces.Box(low=0, high=255, shape=(7,), dtype=np.uint8)
 
         # 5 actions - move left, move right, move left fast, move right fast, do nothing
-        # self.action_space = spaces.Discrete(5)
-        self.action_space = 5
+        self.action_space = spaces.Discrete(5)
+        #self.action_space = 5
 
         self._action_to_key = {
             "stay": 0,
@@ -67,7 +68,13 @@ class BreakoutEnv:
 
     def _get_obs(self):
         # get the current state of the game
-        return np.array(pygame.surfarray.array3d(pygame.display.get_surface()))
+        # return np.array(pygame.surfarray.array3d(pygame.display.get_surface()))
+        ball_pos = (self.ball.pos_x, self.ball.pos_y)
+        ball_vel = (self.ball.velocity_x, self.ball.velocity_y)
+        paddle_pos = (self._paddle_position,)
+        brick_positions = [(brick.pos_x, brick.pos_y, int(brick.alive)) for brick in self.bricks]
+
+        return np.array(ball_pos + ball_vel + paddle_pos + sum(brick_positions, ()))
 
     def _get_info(self):
         return {"reward": self.reward, "time": self.time}
