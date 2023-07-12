@@ -4,6 +4,7 @@ import numpy as np
 from ball import Ball
 from paddle import Paddle
 from brick import Brick
+import time
 
 # Define colors
 BLACK = (0, 0, 0)
@@ -128,7 +129,7 @@ class BreakoutEnv:
 
         self._render_frame()
 
-        return self._get_obs(), reward, terminated, False, self._get_info()
+        return self._get_obs(), reward, terminated, self._get_info()
 
     def _render_frame(self):
         pygame.init()
@@ -163,6 +164,7 @@ class BreakoutEnv:
 
         # Update the display
         pygame.display.flip()
+        time.sleep(0.01)
 
     def close(self):
         if self.window is not None:

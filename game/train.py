@@ -1,9 +1,15 @@
 from breakout import BreakoutEnv
 from montecarlo import MCModel as MC
+import numpy as np
 
 env = BreakoutEnv()
 
-eps = 10
+
+def choose_action():
+    return np.random.choice(["stay", "left", "right", "up", "down"])
+
+
+eps = 2
 S = 15 * 10 * 3
 A = 5
 m = MC(S, A, epsilon=1)
@@ -12,10 +18,10 @@ for i in range(1, eps + 1):
     observation = env.reset()
     while True:
         # Choosing behavior policy
-        action = m.choose_action(m.b, observation)
+        action = choose_action()
 
         # Run simulation
-        next_observation, reward, done, _ = env.step(action)
+        next_observation, reward, done, info = env.step(action)
         ep.append((observation, action, reward))
         observation = next_observation
         if done:
