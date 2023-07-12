@@ -19,17 +19,17 @@ class BreakoutEnv:
 
     def __init__(self):
         self.render_mode = "human"
-        self.window = None
         self.size_height = 15
         self.size_width = 10
         self.cell_size = 15
         self.window_width = self.size_width * self.cell_size
         self.window_height = self.size_height * self.cell_size
         self.window_size = (self.window_width, self.window_height)
-
         self.brick_rows = 3
         self.brick_cols = 5
         self.terminal_reward = (self.brick_rows * self.brick_cols)
+
+        self.window = None
 
         self.score = 0
         self.time = 0
@@ -53,11 +53,8 @@ class BreakoutEnv:
         }
 
         self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
-        self.ball._ball_position = self.ball.ball_location()
-        self.ball._ball_velocity = self.ball.ball_velocity()
         self.paddle = Paddle(((self.window_width // 2) - 2) * self.cell_size, self.window_height - 5,
                              5 * self.cell_size, self.window_width)
-        self._paddle_position = self.paddle.paddle_location()
         self.bricks = []
 
         for row in range(self.brick_rows):
@@ -72,7 +69,7 @@ class BreakoutEnv:
         # return np.array(pygame.surfarray.array3d(pygame.display.get_surface()))
         ball_pos = (self.ball.pos_x, self.ball.pos_y)
         ball_vel = (self.ball.velocity_x, self.ball.velocity_y)
-        paddle_pos = (self._paddle_position,)
+        paddle_pos = (self.paddle.pos_x, self.paddle.pos_y)
         brick_positions = [(brick.pos_x, brick.pos_y, int(brick.alive)) for brick in self.bricks]
 
         return np.array(ball_pos + ball_vel + paddle_pos + sum(brick_positions, ()))
@@ -84,11 +81,8 @@ class BreakoutEnv:
         self.score = 0
         self.time = 0
         self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
-        self.ball._ball_position = self.ball.ball_location()
-        self.ball._ball_velocity = self.ball.ball_velocity()
         self.paddle = Paddle(((self.window_width // 2) - 2) * self.cell_size, self.window_height - 5,
                              5 * self.cell_size, self.window_width)
-        self._paddle_position = self.paddle.paddle_location()
         self.bricks = []
 
         for row in range(self.brick_rows):
@@ -99,22 +93,23 @@ class BreakoutEnv:
                 counter += 3
 
         if self.render_mode == "human":
-            self._render_frame()
+            pygame.init()
+            pygame.display.set_caption("Game Board")
+            self.window = pygame.display.set_mode(self.window_size)
 
         return self._get_obs(), self._get_info()
 
     def step(self, action):
-        action_choice = self._action_to_key[action]
-        if action_choice == 0:
+        if self._action_to_key[action] == 0:
             pass
-        elif action_choice == 1:
-            self._paddle_position = self.paddle.moveLeft()
-        elif action_choice == 2:
-            self._paddle_position = self.paddle.moveRight()
-        elif action_choice == 3:
-            self._paddle_position = self.paddle.moveRightFast()
-        elif action_choice == 4:
-            self._paddle_position = self.paddle.moveLeftFast()
+        elif self._action_to_key[action] == 1:
+            self.paddle.moveLeft()
+        elif self._action_to_key[action] == 2:
+            self.paddle.moveRight()
+        elif self._action_to_key[action] == 3:
+            self.paddle.moveRightFast()
+        elif self._action_to_key[action] == 4:
+            self.paddle.moveLeftFast()
 
         # episode is done iff the ball hits the bottom or all bricks are destroyed
         terminated = self._check_game_terminated()
@@ -132,10 +127,6 @@ class BreakoutEnv:
         return self._get_obs(), reward, terminated, self._get_info()
 
     def _render_frame(self):
-        pygame.init()
-        pygame.display.init()
-        self.window = pygame.display.set_mode(self.window_size)
-
         # Fill the background
         self.window.fill(BLACK)
 
