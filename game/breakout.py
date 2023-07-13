@@ -19,11 +19,11 @@ class BreakoutEnv:
 
     def __init__(self):
         self.render_mode = "human"
-        self.size_height = 15
-        self.size_width = 10
+        self.board_height = 10
+        self.board_width = 15
         self.cell_size = 15
-        self.window_width = self.size_width * self.cell_size
-        self.window_height = self.size_height * self.cell_size
+        self.window_width = self.board_width * self.cell_size
+        self.window_height = self.board_height * self.cell_size
         self.window_size = (self.window_width, self.window_height)
         self.brick_rows = 3
         self.brick_cols = 5
@@ -37,12 +37,12 @@ class BreakoutEnv:
 
         # observation space - 15x10x3
         # self.observation_space = spaces.Box(low=0, high=255, shape=(self.size_height, self.size_width, 3), dtype=np.uint8)
-        #self.observation_space = 15 * 10 * 3
+        # self.observation_space = 15 * 10 * 3
         self.observation_space = spaces.Box(low=0, high=255, shape=(7,), dtype=np.uint8)
 
         # 5 actions - move left, move right, move left fast, move right fast, do nothing
         self.action_space = spaces.Discrete(5)
-        #self.action_space = 5
+        # self.action_space = 5
 
         self._action_to_key = {
             "stay": 0,
@@ -52,16 +52,14 @@ class BreakoutEnv:
             "down": 4
         }
 
-        self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
-        self.paddle = Paddle(((self.window_width // 2) - 2) * self.cell_size, self.window_height - 5,
-                             5 * self.cell_size, self.window_width)
+        self.ball = Ball(self.window_width // 2, self.window_height - 15, 7, 1, -1)
+        self.paddle = Paddle(((self.board_width // 2) - 2) * self.cell_size, self.window_height - 5, 5 * self.cell_size, self.window_width)
         self.bricks = []
 
         for row in range(self.brick_rows):
             counter = 0
-            while counter < self.window_width:
-                self.bricks.append(
-                    Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
+            while counter < self.board_width:
+                self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 counter += 3
 
     def _get_obs(self):
@@ -80,14 +78,14 @@ class BreakoutEnv:
     def reset(self):
         self.score = 0
         self.time = 0
-        self.ball = Ball(self.size_width // 2, self.size_height - 15, 7, 1, -1)
-        self.paddle = Paddle(((self.window_width // 2) - 2) * self.cell_size, self.window_height - 5,
-                             5 * self.cell_size, self.window_width)
+        self.ball = Ball(self.window_width // 2, self.window_height - 15, 7, 1, -1)
+        self.paddle = Paddle(((self.board_width // 2) - 2) * self.cell_size, self.window_height - 5, 5 * self.cell_size,
+                             self.window_width)
         self.bricks = []
 
         for row in range(self.brick_rows):
             counter = 0
-            while counter < self.window_width:
+            while counter < self.board_width:
                 self.bricks.append(
                     Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 counter += 3
@@ -111,8 +109,30 @@ class BreakoutEnv:
         elif self._action_to_key[action] == 4:
             self.paddle.moveLeftFast()
 
-        # episode is done iff the ball hits the bottom or all bricks are destroyed
+        terminated, reward = self._render_frame()
+
+        return self._get_obs(), reward, terminated, self._get_info()
+
+    def _render_frame(self):
+        pygame.init()
+        pygame.display.set_caption("Game Board")
+        self.window = pygame.display.set_mode(self.window_size)
+
+        # Fill the background
+        self.window.fill(BLACK)
+
+        # Draw the game board
+        for row in range(self.board_height):
+            for col in range(self.board_width):
+                x = col * self.cell_size
+                y = row * self.cell_size
+                pygame.draw.rect(self.window, WHITE, (x, y, self.cell_size - 1, self.cell_size - 1))
+
+        # Draw additional elements (e.g., game pieces)
+        self.ball.move()
+
         terminated = self._check_game_terminated()
+
         reward = 0
         if self._check_collision_bricks():
             reward = 1
@@ -122,29 +142,9 @@ class BreakoutEnv:
             reward = 1000
             self.reward += reward
 
-        self._render_frame()
-
-        return self._get_obs(), reward, terminated, self._get_info()
-
-    def _render_frame(self):
-        # Fill the background
-        self.window.fill(BLACK)
-
-        # Draw the game board
-        for row in range(self.window_height):
-            for col in range(self.window_width):
-                x = col * self.cell_size
-                y = row * self.cell_size
-                pygame.draw.rect(self.window, WHITE, (x, y, self.cell_size - 1, self.cell_size - 1))
-
-        # Draw additional elements (e.g., game pieces)
-        self.ball.move()
-
         self._check_collision_walls()
         self._check_collision_paddle()
-        self._check_collision_bricks()
 
-        # print(ball.pos_x)
         pygame.draw.circle(self.window, RED, (self.ball.pos_x, self.ball.pos_y), self.ball.radius)
         pygame.draw.rect(self.window, GREEN,
                          (self.paddle.pos_x, self.paddle.pos_y, self.paddle.paddle_width, self.cell_size))
@@ -156,6 +156,8 @@ class BreakoutEnv:
         # Update the display
         pygame.display.flip()
         time.sleep(0.01)
+
+        return terminated, reward
 
     def close(self):
         if self.window is not None:
@@ -184,7 +186,7 @@ class BreakoutEnv:
         return True
 
     def _check_collision_bricks(self):
-        is_collided = False
+        is_collided = False  # if the ball collided with a brick return true to give reward
         for brick in self.bricks:
             if brick.alive:
                 # bottom
@@ -219,13 +221,18 @@ class BreakoutEnv:
 
     def _check_collision_paddle(self):
         if self.ball.pos_y == self.window_height - (self.ball.radius + 5):
-            if self.ball.pos_x + self.ball.radius >= self.paddle.pos_x and self.ball.pos_x < self.paddle.pos_x + (self.paddle.paddle_width // 5):
+            if self.ball.pos_x + self.ball.radius >= self.paddle.pos_x and self.ball.pos_x < self.paddle.pos_x + (
+                    self.paddle.paddle_width // 5):
                 self.ball.bounce_from_paddle(-2)
-            elif self.paddle.pos_x + (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 2 * (self.paddle.paddle_width // 5):
+            elif self.paddle.pos_x + (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 2 * (
+                    self.paddle.paddle_width // 5):
                 self.ball.bounce_from_paddle(-1)
-            elif self.paddle.pos_x + 2 * (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 3 * (self.paddle.paddle_width // 5):
+            elif self.paddle.pos_x + 2 * (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 3 * (
+                    self.paddle.paddle_width // 5):
                 self.ball.bounce_from_paddle(0)
-            elif self.paddle.pos_x + 3 * (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 4 * (self.paddle.paddle_width // 5):
+            elif self.paddle.pos_x + 3 * (self.paddle.paddle_width // 5) <= self.ball.pos_x < self.paddle.pos_x + 4 * (
+                    self.paddle.paddle_width // 5):
                 self.ball.bounce_from_paddle(1)
-            elif self.ball.pos_x >= self.paddle.pos_x + 4 * (self.paddle.paddle_width // 5) and self.ball.pos_x - self.ball.radius < self.paddle.pos_x + self.paddle.paddle_width:
+            elif self.ball.pos_x >= self.paddle.pos_x + 4 * (
+                    self.paddle.paddle_width // 5) and self.ball.pos_x - self.ball.radius < self.paddle.pos_x + self.paddle.paddle_width:
                 self.ball.bounce_from_paddle(2)
