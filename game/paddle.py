@@ -1,4 +1,4 @@
-DISTANCE=5
+DISTANCE=15
 
 class Paddle:
 	def __init__(self, pos_x, pos_y, paddle_width, window_width):
