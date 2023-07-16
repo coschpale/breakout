@@ -1,4 +1,4 @@
-DISTANCE = 5
+DISTANCE=15
 
 
 class Paddle:

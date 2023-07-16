@@ -13,7 +13,6 @@ class Ball:
     def bounce(self, x_bounce, y_bounce):
         if x_bounce:
             self.velocity_y *= -1
-
         if y_bounce:
             self.velocity_x *= -1
 

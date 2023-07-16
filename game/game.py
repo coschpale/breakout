@@ -116,21 +116,23 @@ def checkCollisionWithBricks(bricks, ball):
     for brick in bricks:
         if brick.alive:
             # bottom
-            if ball.pos_y - ball.radius == brick.pos_y + brick.height and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
+            if ball.velocity_y < 0 and ball.pos_y - ball.radius == brick.pos_y + brick.height and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
+                print("Hallo 1 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=True, y_bounce=False)
             # top
-            if ball.pos_y - ball.radius == brick.pos_y and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
+            elif ball.velocity_y > 0 and ball.pos_y + ball.radius == brick.pos_y and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
+                print("Hallo 2 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=True, y_bounce=False)
             # right
-            if ball.pos_x - ball.radius == brick.pos_x + brick.width and ball.pos_y + ball.radius >= brick.pos_y \
-                    and ball.pos_y - ball.radius <= brick.pos_y + brick.height:
+            elif ball.velocity_x < 0 and ball.pos_x - ball.radius == brick.pos_x + brick.width and ball.pos_y + ball.radius >= brick.pos_y and ball.pos_y - ball.radius <= brick.pos_y + brick.height:
+                print("Hallo 3 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=False, y_bounce=True)
             # left
-            if ball.pos_x + ball.radius == brick.pos_x and ball.pos_y + ball.radius >= brick.pos_y and \
-                    ball.pos_y - ball.radius <= brick.pos_y + brick.height:
+            elif ball.velocity_x > 0 and ball.pos_x + ball.radius == brick.pos_x and ball.pos_y + ball.radius >= brick.pos_y and ball.pos_y - ball.radius <= brick.pos_y + brick.height:
+                print("Hallo 4 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=False, y_bounce=True)
 
@@ -142,7 +144,7 @@ bricks = []
 for row in range(brick_rows):
     counter = 0
     while counter < board_width:
-        bricks.append(Brick(counter * cell_size, row * cell_size, 3 * cell_size, cell_size))
+        bricks.append(Brick(counter * cell_size +1, row * cell_size +1, 3 * cell_size - 2, cell_size - 2))
         counter += 3
 
 # Game loop
@@ -217,7 +219,7 @@ while running:
 
     for brick in bricks:
         if brick.alive:
-            pygame.draw.rect(screen, BLUE, (brick.pos_x, brick.pos_y, brick.width - 1, brick.height - 1))
+            pygame.draw.rect(screen, BLUE, (brick.pos_x, brick.pos_y, brick.width, brick.height))
 
     # Update the display
     pygame.display.flip()
