@@ -117,22 +117,18 @@ def checkCollisionWithBricks(bricks, ball):
         if brick.alive:
             # bottom
             if ball.velocity_y < 0 and ball.pos_y - ball.radius == brick.pos_y + brick.height and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
-                print("Hallo 1 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=True, y_bounce=False)
             # top
             elif ball.velocity_y > 0 and ball.pos_y + ball.radius == brick.pos_y and ball.pos_x + ball.radius >= brick.pos_x and ball.pos_x - ball.radius <= brick.pos_x + brick.width:
-                print("Hallo 2 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=True, y_bounce=False)
             # right
             elif ball.velocity_x < 0 and ball.pos_x - ball.radius == brick.pos_x + brick.width and ball.pos_y + ball.radius >= brick.pos_y and ball.pos_y - ball.radius <= brick.pos_y + brick.height:
-                print("Hallo 3 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=False, y_bounce=True)
             # left
             elif ball.velocity_x > 0 and ball.pos_x + ball.radius == brick.pos_x and ball.pos_y + ball.radius >= brick.pos_y and ball.pos_y - ball.radius <= brick.pos_y + brick.height:
-                print("Hallo 4 " + str(ball.velocity_y))
                 brick.kill()
                 ball.bounce(x_bounce=False, y_bounce=True)
 
