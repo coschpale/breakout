@@ -1,35 +1,59 @@
 from breakout import BreakoutEnv
 from montecarlo import MCModel as MC
 import numpy as np
-
-env = BreakoutEnv()
+import time
+import pickle
+env = BreakoutEnv(display=False)
 
 
 def choose_action():
-    return np.random.choice(["stay", "left", "right", "up", "down"])
+    return np.random.choice(["stay", "stay", "stay", "stay", "stay", "left", "left", "left", "right", "right", "right", "up", "down"])
+    #return np.random.choice([0,1,2,3,4])
 
 
-eps = 10
-S = 15 * 10 * 3
-A = 5
+eps = 10000
+S = (2**(5+4))
+A = 3
 m = MC(S, A, epsilon=1)
 for i in range(1, eps + 1):
-    print("Episode {}".format(i))
+    if i % 100 == 0:
+        print("Episode {}".format(i))
     ep = []
     observation = env.reset()
     while True:
         # Choosing behavior policy
-        action = choose_action()
+        action = m.choose_action(m.b, observation)
 
         # Run simulation
-        next_observation, reward, done, info = env.step(action)
+        next_observation, reward, done = env.step(action)
         ep.append((observation, action, reward))
         observation = next_observation
         if done:
             break
 
-    # m.update_Q(ep) TODO throws an error bc of the return of _get_obs
+    m.update_Q(ep)
     # Decaying epsilon, reach optimal policy
     m.epsilon = max((eps - i) / eps, 0.1)
 
-# print("Final expected returns : {}".format(m.score(env, m.pi, n_samples=10000))) TODO throws an error bc of the return of _get_obs
+with open('enviroment.pickle', "wb") as file:
+    pickle.dump(m, file)
+    file.close()
+'''
+with open('enviroment.pickle', "rb") as file:
+    test = pickle.load(file)
+    file.close()
+
+for i in range(1,  100):
+    observation = env.reset()
+    while True:
+        # Choosing behavior policy
+        action = test.choose_action(test.b, observation)
+        time.sleep(0.01)
+        # Run simulation
+        next_observation, reward, done = env.step(action)
+        observation = next_observation
+        if done:
+            break
+'''
+
+#print("Final expected returns : {}".format(m.score(env, m.pi, n_samples=10000)))# TODO throws an error bc of the return of _get_obs

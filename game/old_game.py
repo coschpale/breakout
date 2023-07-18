@@ -6,6 +6,7 @@ from brick import Brick
 import numpy as np
 import argparse
 
+
 # parse if we want to use the agent or play by our own
 parser = argparse.ArgumentParser()
 parser.add_argument("-a", "--agent", help="use the agent to play the game", action="store_true")
@@ -149,7 +150,7 @@ start_time = time.time()
 last_agent_call = time.time()
 action_choice = 0
 while running:
-
+    print('fdsfaff')
     # call the agent if passed as command line argument but only every second and not permanently for smooth gameplay
     if args.agent:
         if time.time() - last_agent_call >= 1:

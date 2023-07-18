@@ -1,10 +1,11 @@
 import pygame
 import time
-from game.ball import Ball
-from game.paddle import Paddle
-from game.brick import Brick
+from ball import Ball
+from paddle import Paddle
+from brick import Brick
 import numpy as np
 import argparse
+import threading
 
 class Breakout_game:
 	def __init__(self, width, height, cell_size):
@@ -13,19 +14,26 @@ class Breakout_game:
 		self.cell_size = cell_size
 		self.window_width = self.width * self.cell_size
 		self.window_height = self.height * self.cell_size
-
+		self._action_to_key = 0
 		window_size = (self.window_width, self.window_height)
+		pygame.init()
 		self.screen = pygame.display.set_mode(window_size)
 
 		self.ball = Ball(self.window_width // 2, self.window_height - 15, 7, 1, -1)
 		self.paddle = Paddle(((self.width // 2) - 2) * cell_size, self.window_height - 5, 5 * cell_size, self.window_width)
 		self.bricks = []
 
-		for row in range(3):
+		for row in range(1):
 			counter = 0
 			while counter < self.width:
 				self.bricks.append(Brick(counter * self.cell_size +1, row * self.cell_size +1, 3 * self.cell_size - 2, self.cell_size - 2))
 				counter += 3
+
+	def start(self):
+		thread = threading.Thread(target=self.run)
+		thread.start()
+		self._action_to_key = 1
+		self._action_to_key = 2
 
 	def run(self):
 		# Define colors
@@ -34,14 +42,14 @@ class Breakout_game:
 		RED = (255, 0, 0)
 		GREEN = (0, 255, 0)
 		BLUE = (0, 0, 255)
-
 		# Game loop
 		running = True
 		start_time = time.time()
 		last_agent_call = time.time()
 		action_choice = 0
 		while running:
-
+			self.test()
+			
 			for event in pygame.event.get():
 				if event.type == pygame.QUIT:
 					running = False
@@ -88,12 +96,46 @@ class Breakout_game:
 
 			# Update the display
 			pygame.display.flip()
-			time.sleep(0.01)
+			time.sleep(0.02)
 
 		# Quit Pygame
 		pygame.quit()
 
+	def test(self):
+		# get the current state of the game
+		# return np.array(pygame.surfarray.array3d(pygame.display.get_surface()))
+		#paddle_pos = (self.paddle.pos_x, self.paddle.pos_y)
+		#brick_positions = [(brick.pos_x, brick.pos_y, int(brick.alive)) for brick in self.bricks]
+		brick_positions = [int(brick.alive) for brick in self.bricks]
+		paddle_pos = self.paddle.pos_x // self.cell_size
+		print(paddle_pos)
+		sum  = 0
+		index = 0
+		for i, val in enumerate(brick_positions):
+			sum += val*(2**index)
+			index += 1
+		print('before ',sum)
+		pad = self._decimal_to_binary(paddle_pos)
+		pad.reverse()
+		for bit in pad:
+			if bit == '1':
+				sum += (2**(index))
+			index += 1
+		print('after ', sum)
+		return sum
+	
+	def _decimal_to_binary(self, decimal_number):
+		if decimal_number == 0:
+			return ['0']  # Special case for zero
 
+		binary_digits = []
+		while decimal_number > 0:
+			binary_digits.append(str(decimal_number % 2))
+			decimal_number //= 2
+
+		binary_digits.reverse()
+		return binary_digits
+	
 	def checkGameOver(self):
 		if self.ball.pos_y >= self.window_height - self.ball.radius:
 			return True
@@ -171,3 +213,9 @@ class Breakout_game:
 				elif self.ball.velocity_x > 0 and self.ball.pos_x + self.ball.radius == brick.pos_x and self.ball.pos_y + self.ball.radius >= brick.pos_y and self.ball.pos_y - self.ball.radius <= brick.pos_y + brick.height:
 					brick.kill()
 					self.ball.bounce(x_bounce=False, y_bounce=True)
+	
+
+if __name__ == "__main__":
+	game = Breakout_game(15,10,15)
+# 	print('fsdfasdff')
+	game.run()
