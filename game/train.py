@@ -3,10 +3,21 @@ from montecarlo import MCModel as MC
 import numpy as np
 import time
 import pickle
-env = BreakoutEnv(display=False)
+
+# the type of the game board
+# can be triangle, single_row or stairs
+# should be changed in the test file as well
+type = 'triangle'
+
+env = BreakoutEnv(display=False, type=type)
 
 eps = 10000
-S = (2**(5+4))
+if type == 'single_row':
+    S = (2**(5+4))
+elif type == 'stairs':
+    S = (2**(6+4))
+elif type == 'triangle':
+    S = (2**(9+4))
 A = 3
 m = MC(S, A, epsilon=1)
 for i in range(1, eps + 1):

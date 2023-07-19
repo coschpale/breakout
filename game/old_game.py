@@ -140,7 +140,14 @@ bricks = []
 
 for row in range(brick_rows):
     counter = 0
-    while counter < board_width:
+    max_counter = 15
+    if row == 1:
+        counter = 3
+        max_counter = 12
+    elif row == 2:
+        counter = 6
+        max_counter = 9
+    while counter < max_counter:
         bricks.append(Brick(counter * cell_size +1, row * cell_size +1, 3 * cell_size - 2, cell_size - 2))
         counter += 3
 
@@ -150,7 +157,6 @@ start_time = time.time()
 last_agent_call = time.time()
 action_choice = 0
 while running:
-    print('fdsfaff')
     # call the agent if passed as command line argument but only every second and not permanently for smooth gameplay
     if args.agent:
         if time.time() - last_agent_call >= 1:

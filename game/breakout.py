@@ -14,17 +14,24 @@ BLUE = (0, 0, 255)
 
 class BreakoutEnv:
 
-    def __init__(self, display):
+    def __init__(self, display, type):
         self.display = display
+        self.type = type
         self.board_height = 10
         self.board_width = 15
         self.cell_size = 15
         self.window_width = self.board_width * self.cell_size
         self.window_height = self.board_height * self.cell_size
         self.window_size = (self.window_width, self.window_height)
-        self.brick_rows = 1
-        self.brick_cols = 5
-        self.terminal_reward = (self.brick_rows * self.brick_cols)
+        if type == 'single_row':
+            self.brick_rows = 1
+            self.brick_cols = 5
+        elif type == 'stairs':
+            self.brick_rows = 4
+            self.brick_cols = 5
+        elif type == 'triangle':
+            self.brick_rows = 3
+            self.brick_cols = 5
 
         self.window = None
 
@@ -53,8 +60,20 @@ class BreakoutEnv:
 
         for row in range(self.brick_rows):
             counter = 0
-            while counter < self.board_width:
-                self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
+            max_counter = self.board_width
+            if self.type == 'triangle':
+                if row == 1:
+                    counter += 3
+                    max_counter -= 3
+                if row == 2:
+                    counter += 6
+                    max_counter -= 6
+            while counter < max_counter:
+                if self.type == 'single_row' or self.type == 'triangle':
+                    self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
+                elif self.type == 'stairs':
+                    if ((counter // 3) + row) % 3 == 2:
+                        self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 counter += 3
 
     def _get_obs(self):
@@ -103,9 +122,20 @@ class BreakoutEnv:
 
         for row in range(self.brick_rows):
             counter = 0
-            while counter < self.board_width:
-                self.bricks.append(
-                    Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
+            max_counter = self.board_width
+            if self.type == 'triangle':
+                if row == 1:
+                    counter += 3
+                    max_counter -= 3
+                if row == 2:
+                    counter += 6
+                    max_counter -= 6
+            while counter < max_counter:
+                if self.type == 'single_row' or self.type == 'triangle':
+                    self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
+                elif self.type == 'stairs':
+                    if ((counter // 3) + row) % 3 == 2:
+                        self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 counter += 3
 
         if self.display:
