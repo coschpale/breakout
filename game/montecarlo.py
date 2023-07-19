@@ -6,7 +6,6 @@ class MCModel:
     def __init__(self, state_space, action_space, gamma=1.0, epsilon=0.1):
         self.gamma = gamma
         self.epsilon = epsilon
-        self.Q = None
         self.action_space = np.arange(action_space)
         actions = [0] * action_space
         # Action representation
