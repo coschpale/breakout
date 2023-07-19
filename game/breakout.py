@@ -1,4 +1,3 @@
-from gym import spaces
 import pygame
 import numpy as np
 from ball import Ball
@@ -12,7 +11,6 @@ WHITE = (255, 255, 255)
 RED = (255, 0, 0)
 GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
-
 
 class BreakoutEnv:
 
@@ -37,10 +35,8 @@ class BreakoutEnv:
         # observation space - 15x10x3
         # self.observation_space = spaces.Box(low=0, high=255, shape=(self.size_height, self.size_width, 3), dtype=np.uint8)
         # self.observation_space = 15 * 10 * 3
-        self.observation_space = spaces.Box(low=0, high=255, shape=(7,), dtype=np.uint8)
 
         # 5 actions - move left, move right, move left fast, move right fast, do nothing
-        self.action_space = spaces.Discrete(5)
         # self.action_space = 5
 
         self._action_to_key = {
@@ -156,16 +152,13 @@ class BreakoutEnv:
 
         reward = 0
         if self._check_collision_bricks():
-            reward = 1
-            self.reward += reward
+            reward = 0
         elif self._check_game_won():
             # not sure if we really need this bc we only have 1 live, but if the reward overall is taken into account
-            reward = 0
-            self.reward += reward
+            reward = 100
         elif self._check_game_over():
             # not sure if we really need this bc we only have 1 live, but if the reward overall is taken into account
             reward = -1000
-            self.reward += reward
 
         self._check_collision_walls()
         self._check_collision_paddle()

@@ -5,12 +5,6 @@ import time
 import pickle
 env = BreakoutEnv(display=False)
 
-
-def choose_action():
-    return np.random.choice(["stay", "stay", "stay", "stay", "stay", "left", "left", "left", "right", "right", "right", "up", "down"])
-    #return np.random.choice([0,1,2,3,4])
-
-
 eps = 10000
 S = (2**(5+4))
 A = 3
