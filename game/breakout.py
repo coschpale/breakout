@@ -26,6 +26,9 @@ class BreakoutEnv:
         if type == 'single_row':
             self.brick_rows = 1
             self.brick_cols = 5
+        if type == 'triple_row':
+            self.brick_rows = 3
+            self.brick_cols = 5
         elif type == 'stairs':
             self.brick_rows = 4
             self.brick_cols = 5
@@ -69,7 +72,7 @@ class BreakoutEnv:
                     counter += 6
                     max_counter -= 6
             while counter < max_counter:
-                if self.type == 'single_row' or self.type == 'triangle':
+                if self.type == 'single_row' or self.type == 'triple_row' or self.type == 'triangle':
                     self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 elif self.type == 'stairs':
                     if ((counter // 3) + row) % 3 == 2:
@@ -131,7 +134,7 @@ class BreakoutEnv:
                     counter += 6
                     max_counter -= 6
             while counter < max_counter:
-                if self.type == 'single_row' or self.type == 'triangle':
+                if self.type == 'single_row' or self.type == 'triple_row' or self.type == 'triangle':
                     self.bricks.append(Brick(counter * self.cell_size, row * self.cell_size, 3 * self.cell_size, self.cell_size))
                 elif self.type == 'stairs':
                     if ((counter // 3) + row) % 3 == 2:

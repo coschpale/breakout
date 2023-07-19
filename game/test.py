@@ -3,7 +3,7 @@ from montecarlo import MCModel as MC
 import numpy as np
 import time
 import pickle
-env = BreakoutEnv(display=True, type='triangle')
+env = BreakoutEnv(display=True, type='triple_row')
 
 def main():
 	test = ''

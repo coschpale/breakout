@@ -7,13 +7,15 @@ import pickle
 # the type of the game board
 # can be triangle, single_row or stairs
 # should be changed in the test file as well
-type = 'triangle'
+type = 'triple_row'
 
 env = BreakoutEnv(display=False, type=type)
 
-eps = 10000
+eps = 1000
 if type == 'single_row':
     S = (2**(5+4))
+if type == 'triple_row':
+    S = (2**(15+4))
 elif type == 'stairs':
     S = (2**(6+4))
 elif type == 'triangle':
